@@ -1,8 +1,6 @@
 # ansible
-Created VMs using Vagrant in Oracle VirtualBox
-$ vagrant --version
-Vagrant 2.4.1
+Created VMs using Vagrant(version 2.4.1) in Oracle VirtualBox
 
-Vgarant code is placed inside vagrant directory
+## Vgarant file is placed inside the vagrant directory
 
 
