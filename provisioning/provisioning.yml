@@ -1,0 +1,76 @@
+---
+- name: Provisioning servers
+  hosts: all
+  become: yes
+  tasks:
+    - name: Installing ntp agent on centos
+      yum:
+        name: "{{item}}"
+        state: present
+      when: ansible_distribution == "CentOS"
+      loop:
+        - chrony
+        - wget
+        - git
+        - zip
+        - unzip
+
+    - name: Installing ntp agent on ubuntu
+      apt:
+        name: "{{item}}"
+        state: present
+        update_cache: yes
+      when: ansible_distribution == "Ubuntu"
+      loop:
+        - ntp
+        - wget
+        - git
+        - zip
+        - unzip
+
+    - name: Start service on centos
+      service:
+        name: chrony
+        state: started
+        enabled: yes
+      when: ansible_distribution == "CentOS" and ansible_selinux.status != "enabled"
+
+    - name: Start service on ubuntu
+      service:
+        name: ntp
+        state: started
+        enabled: yes
+      when: ansible_distribution == "Ubuntu" and ansible_selinux.status != "enabled"
+
+    - name: Banner file
+      copy:
+        content: '# This server is managed by ansible'
+        dest: /etc/motd
+
+    - name: Deploy ntp agent conf on centos
+      template:
+        src: templates/ntpconf_centos
+        dest: /etc/chrony.conf
+        backup: yes
+      when: ansible_distribution == "CentOS"
+
+    - name: Deploy ntp agent conf on ubuntu
+      template:
+        src: templates/ntpconf_ubuntu
+        dest: /etc/ntp.conf
+        backup: yes
+      when: ansible_distribution == "Ubuntu"
+
+    - name: restart service on centos
+      service:
+        name: chrony
+        state: started
+        enabled: yes
+      when: ansible_distribution == "CentOS" and ansible_selinux.status != "enabled"
+
+    - name: restart service on ubuntu
+      service:
+        name: ntp
+        state: started
+        enabled: yes
+      when: ansible_distribution == "Ubuntu" and ansible_selinux.status != "enabled"
