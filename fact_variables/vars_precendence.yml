@@ -1,0 +1,21 @@
+---
+- name: Understanding vars
+  hosts: all
+  become: yes
+  # ansible playbook variable has higher priority than group_vars/all
+  #vars:
+  #  USRNM: playuser
+  #  COMM: variable from playuser
+  tasks:
+    - name: create user
+      ansible.builtin.user:
+        name: "{{USRNM}}"
+        comment: "{{COMM}}"
+      register: usrout
+
+    - debug:
+        var: usrout
+    - debug:
+        var: usrout.name
+    - debug:
+        var: usrout.comment
