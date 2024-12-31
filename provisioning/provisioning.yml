@@ -53,6 +53,8 @@
         dest: /etc/chrony.conf
         backup: yes
       when: ansible_distribution == "CentOS"
+      notify:
+        - restart service on centos
 
     - name: Deploy ntp agent conf on ubuntu
       template:
@@ -60,17 +62,28 @@
         dest: /etc/ntp.conf
         backup: yes
       when: ansible_distribution == "Ubuntu"
+      notify:
+        - restart service on ubuntu
 
+  handlers:
     - name: restart service on centos
       service:
         name: chrony
         state: started
         enabled: yes
-      when: ansible_distribution == "CentOS" and ansible_selinux.status != "enabled"
+        #when: ansible_distribution == "CentOS" and ansible_selinux.status != "enabled"
+      when: ansible_distribution == "CentOS"
 
     - name: restart service on ubuntu
       service:
         name: ntp
         state: started
         enabled: yes
-      when: ansible_distribution == "Ubuntu" and ansible_selinux.status != "enabled"
+        #when: ansible_distribution == "Ubuntu" and ansible_selinux.status != "enabled"
+      when: ansible_distribution == "Ubuntu"
+
+    - name: Create a directory if it does not exist
+      file:
+        path: /opt/test_dir
+        state: directory
+        mode: '0755'
